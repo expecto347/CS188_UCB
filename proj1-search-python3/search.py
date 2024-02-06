@@ -19,6 +19,7 @@ Pacman agents (in searchAgents.py).
 
 import util
 
+
 class SearchProblem:
     """
     This class outlines the structure of a search problem, but doesn't implement
@@ -62,6 +63,31 @@ class SearchProblem:
         util.raiseNotDefined()
 
 
+class SearchNode:
+    """
+    A node in the search tree. Contains a pointer to the parent (the node that
+    this is a successor of) and to the actual state for this node. Note that if
+    a state is arrived at by two paths, then there are two nodes with the same
+    state.
+    """
+
+    def __init__(self, state, parent=None, action=None, cost=0):
+        self.state = state
+        self.parent = parent
+        self.action = action
+        self.cost = cost
+
+    def getPath(self):
+        # Returns the sequence of actions to go from the root to this node.
+        actions = []
+        current_node = self
+        while current_node.parent is not None:
+            actions.append(current_node.action)
+            current_node = current_node.parent
+        actions.reverse()  # The actions were added in reverse order, so reverse them to get the correct order.
+        return actions
+
+
 def tinyMazeSearch(problem):
     """
     Returns a sequence of moves that solves tinyMaze.  For any other maze, the
@@ -70,7 +96,8 @@ def tinyMazeSearch(problem):
     from game import Directions
     s = Directions.SOUTH
     w = Directions.WEST
-    return  [s, s, w, s, w, w, s, w]
+    return [s, s, w, s, w, w, s, w]
+
 
 def depthFirstSearch(problem):
     """
@@ -86,18 +113,107 @@ def depthFirstSearch(problem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    # Initialize the fringe and visited set
+    visited = set()
+    fringe = util.Stack()
+
+    start = problem.getStartState()
+    start_node = SearchNode(start)
+    fringe.push(start_node)
+
+    # While there are nodes in the fringe
+    while not fringe.isEmpty():
+        # Pop the top node from the fringe
+        current_node = fringe.pop()
+
+        # If the current node is the goal, return the path
+        if problem.isGoalState(current_node.state):
+            return current_node.getPath()
+
+        # If the current node has not been visited
+        if current_node.state not in visited:
+            # Add the current node to the visited set
+            visited.add(current_node.state)
+
+            # For each successor of the current node
+            for successor, action, stepCost in problem.getSuccessors(current_node.state):
+                # Create a new node for the successor
+                new_node = SearchNode(successor, current_node, action, current_node.cost + stepCost)
+                # Add the new node to the fringe
+                fringe.push(new_node)
+
+    # If the fringe is empty and no path is found, return an empty list
+    return []
+
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # Initialize the fringe and visited set
+    visited = set()
+    fringe = util.PriorityQueue()
+
+    start = problem.getStartState()
+    start_node = SearchNode(start)
+    fringe.push(start_node, 0)
+
+    # While there are nodes in the fringe
+    while not fringe.isEmpty():
+        # Pop the top node from the fringe
+        current_node = fringe.pop()
+
+        # If the current node is the goal, return the path
+        if problem.isGoalState(current_node.state):
+            return current_node.getPath()
+
+        # If the current node has not been visited
+        if current_node.state not in visited:
+            # Add the current node to the visited set
+            visited.add(current_node.state)
+
+            # For each successor of the current node
+            for successor, action, stepCost in problem.getSuccessors(current_node.state):
+                # Create a new node for the successor
+                new_node = SearchNode(successor, current_node, action, current_node.cost + stepCost)
+                # Add the new node to the fringe
+                fringe.push(new_node, len(new_node.getPath()))
+
+    # If the fringe is empty and no path is found, return an empty list
+    return []
 
 def uniformCostSearch(problem):
-    """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # Initialize the fringe and visited set
+    visited = set()
+    fringe = util.PriorityQueue()
+
+    start = problem.getStartState()
+    start_node = SearchNode(start)
+    fringe.push(start_node, 0)
+
+    # While there are nodes in the fringe
+    while not fringe.isEmpty():
+        # Pop the top node from the fringe
+        current_node = fringe.pop()
+
+        # If the current node is the goal, return the path
+        if problem.isGoalState(current_node.state):
+            return current_node.getPath()
+
+        # If the current node has not been visited
+        if current_node.state not in visited:
+            # Add the current node to the visited set
+            visited.add(current_node.state)
+
+            # For each successor of the current node
+            for successor, action, stepCost in problem.getSuccessors(current_node.state):
+                # Create a new node for the successor
+                new_node = SearchNode(successor, current_node, action, current_node.cost + stepCost)
+                # Add the new node to the fringe
+                fringe.push(new_node, new_node.cost)
+
+    # If the fringe is empty and no path is found, return an empty list
+    return []
+
 
 def nullHeuristic(state, problem=None):
     """
@@ -106,10 +222,40 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
+
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # Initialize the fringe and visited set
+    visited = set()
+    fringe = util.PriorityQueue()
+
+    start = problem.getStartState()
+    start_node = SearchNode(start)
+    fringe.push(start_node, 0)
+
+    # While there are nodes in the fringe
+    while not fringe.isEmpty():
+        # Pop the top node from the fringe
+        current_node = fringe.pop()
+
+        # If the current node is the goal, return the path
+        if problem.isGoalState(current_node.state):
+            return current_node.getPath()
+
+        # If the current node has not been visited
+        if current_node.state not in visited:
+            # Add the current node to the visited set
+            visited.add(current_node.state)
+
+            # For each successor of the current node
+            for successor, action, stepCost in problem.getSuccessors(current_node.state):
+                # Create a new node for the successor
+                new_node = SearchNode(successor, current_node, action, current_node.cost + stepCost)
+                # Add the new node to the fringe
+                fringe.push(new_node, new_node.cost + heuristic(successor, problem))
+
+    # If the fringe is empty and no path is found, return an empty list
+    return []
 
 
 # Abbreviations
