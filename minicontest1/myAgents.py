@@ -47,9 +47,6 @@ class MyAgent(Agent):
         leave it blank
         """
 
-        "*** YOUR CODE HERE"
-
-        raise NotImplementedError()
 
 """
 Put any other SearchProblems or search methods below. You may also import classes/methods in
@@ -64,14 +61,12 @@ class ClosestDotAgent(Agent):
         gameState.
         """
         # Here are some useful elements of the startState
-        startPosition = gameState.getPacmanPosition(self.index)
-        food = gameState.getFood()
-        walls = gameState.getWalls()
+        # startPosition = gameState.getPacmanPosition()
+        # food = gameState.getFood()
+        # walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState, self.index)
-
-
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        path = search.bfs(problem)
+        return path
 
     def getAction(self, state):
         return self.findPathToClosestDot(state)[0]
@@ -109,6 +104,5 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         """
         x,y = state
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.food[x][y]
 
